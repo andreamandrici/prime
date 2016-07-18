@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css" />
+        <link rel="stylesheet" type="text/css" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/label.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+        <link rel="stylesheet" href="css/leaflet.draw.css" />
+        <link rel="stylesheet" href="css/leaflet.measurecontrol.css" />
+        <script src="js/leaflet.js"></script>
+        <script src="js/OSMBuildings-Leaflet.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/label.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/leaflet.draw.js"></script>
+        <script src="js/leaflet.measurecontrol.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="data/json_colonnine0.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        var map = L.map('map', {
+            measureControl:true,
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.addAttribution('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a>');
+        var feature_group = new L.featureGroup([]);
+        var bounds_group = new L.featureGroup([]);
+        var raster_group = new L.LayerGroup([]);
+        var basemap0 = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 28
+        });
+        basemap0.addTo(map);
+        var initialOrder = new Array();
+        var layerOrder = new Array();
+        function stackLayers() {
+            for (index = 0; index < initialOrder.length; index++) {
+                map.removeLayer(initialOrder[index]);
+                map.addLayer(initialOrder[index]);
+            }
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        function restackLayers() {
+            for (index = 0; index < layerOrder.length; index++) {
+                layerOrder[index].bringToFront();
+            }
+        }
+        layerControl = L.control.layers({},{},{collapsed:false});
+        function pop_colonnine0(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    layer.setStyle(doStylecolonnine0(feature));
+
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['citta'] !== null ? Autolinker.link(String(feature.properties['citta'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['comune'] !== null ? Autolinker.link(String(feature.properties['comune'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['indirizzo'] !== null ? Autolinker.link(String(feature.properties['indirizzo'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['long'] !== null ? Autolinker.link(String(feature.properties['long'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['lat'] !== null ? Autolinker.link(String(feature.properties['lat'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['xcoor'] !== null ? Autolinker.link(String(feature.properties['xcoor'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['ycoor'] !== null ? Autolinker.link(String(feature.properties['ycoor'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['pubblica'] !== null ? Autolinker.link(String(feature.properties['pubblica'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['privata'] !== null ? Autolinker.link(String(feature.properties['privata'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['potenza_ma'] !== null ? Autolinker.link(String(feature.properties['potenza_ma'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tecnologia'] !== null ? Autolinker.link(String(feature.properties['tecnologia'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tipo_1'] !== null ? Autolinker.link(String(feature.properties['tipo_1'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tipo_2'] !== null ? Autolinker.link(String(feature.properties['tipo_2'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tipo_3a'] !== null ? Autolinker.link(String(feature.properties['tipo_3a'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tipo_3c'] !== null ? Autolinker.link(String(feature.properties['tipo_3c'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['schuko'] !== null ? Autolinker.link(String(feature.properties['schuko'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['std_europe'] !== null ? Autolinker.link(String(feature.properties['std_europe'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tecnolog_1'] !== null ? Autolinker.link(String(feature.properties['tecnolog_1'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['disponibil'] !== null ? Autolinker.link(String(feature.properties['disponibil'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['proprietar'] !== null ? Autolinker.link(String(feature.properties['proprietar'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['promotore'] !== null ? Autolinker.link(String(feature.properties['promotore'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['tipologia'] !== null ? Autolinker.link(String(feature.properties['tipologia'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['scenario'] !== null ? Autolinker.link(String(feature.properties['scenario'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['accordo_re'] !== null ? Autolinker.link(String(feature.properties['accordo_re'])) : '') + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStylecolonnine0(feature) {
+			switch (feature.properties.tipologia) {
+                case 'IMPIANTI DI DISTRIBUZIONE CARBURANTE':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#92dc80',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'INFRASTRUTTURA DI RICARICA PRIVATA':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#d0ca5a',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'INFRASTRUTTURA DI RICARICA PRIVATA ACCESSIBILE AL PUBBLICO':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#569ce6',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'INFRASTRUTTURA DI RICARICA SU SUOLO PRIVATO':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#81e7c3',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'INFRASTRUTTURA DI RICARICA SU SUOLO PUBBLICO':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#cf4839',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'PRIVATA SU OFFICINA MECCANICA':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#9e7dd7',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+            }
+        }
+        var json_colonnine0JSON = new L.geoJson(json_colonnine0, {
+            onEachFeature: pop_colonnine0,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, doStylecolonnine0(feature)).bindLabel((feature.properties.id !== null?String('<div style="color: #000000; font-size: 8pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + feature.properties.id) + '</div>':''), {noHide: true, offset: [-0, -16]})
+            }
+        });
+        layerOrder[layerOrder.length] = json_colonnine0JSON;
+
+        bounds_group.addLayer(json_colonnine0JSON);
+        initialOrder[initialOrder.length] = json_colonnine0JSON;
+        feature_group.addLayer(json_colonnine0JSON);
+        raster_group.addTo(map);
+        feature_group.addTo(map);
+        var baseMaps = {'OSM': basemap0};
+        L.control.layers(baseMaps,{'colonnine<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/colonnine0_IMPIANTIDIDISTRIBUZIONECARBURANTE.png" /> IMPIANTI DI DISTRIBUZIONE CARBURANTE<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/colonnine0_INFRASTRUTTURADIRICARICAPRIVATA.png" /> INFRASTRUTTURA DI RICARICA PRIVATA<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/colonnine0_INFRASTRUTTURADIRICARICAPRIVATAACCESSIBILEALPUBBLICO.png" /> INFRASTRUTTURA DI RICARICA PRIVATA ACCESSIBILE AL PUBBLICO<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/colonnine0_INFRASTRUTTURADIRICARICASUSUOLOPRIVATO.png" /> INFRASTRUTTURA DI RICARICA SU SUOLO PRIVATO<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/colonnine0_INFRASTRUTTURADIRICARICASUSUOLOPUBBLICO.png" /> INFRASTRUTTURA DI RICARICA SU SUOLO PUBBLICO<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/colonnine0_PRIVATASUOFFICINAMECCANICA.png" /> PRIVATA SU OFFICINA MECCANICA<br />': json_colonnine0JSON,},{collapsed:false}).addTo(map);
+        L.control.scale({options: {position: 'bottomleft', maxWidth: 100, metric: true, imperial: false, updateWhenIdle: false}}).addTo(map);
+        stackLayers();
+        map.on('overlayadd', restackLayers);
+        </script>
+    </body>
+</html>
